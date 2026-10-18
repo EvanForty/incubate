@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Incubate: hatch chickens, lay eggs, harvest yield</title>
+<meta name="description" content="Incubate is a Solana launchpad where chicken NFTs lay eggs backed by real creator fees from coins launched on pump.fun. Crack eggs for yield or hatch them into more chickens.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/logo.png">
+<meta name="theme-color" content="#FFD898">
+<meta property="og:title" content="Incubate: hatch chickens, lay eggs, harvest yield">
+<meta property="og:description" content="Chicken NFTs that lay eggs backed by real creator fees from coins launched on pump.fun. Crack eggs for yield or hatch them into more chickens.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<style>
+:root{
+  --bg:#FFF6E6;--panel:#FFFDF6;--ink:#3A2412;--soft:#6B4A2E;--mute:#9C7F62;--rule:#EFDDBF;--edge:#3A2412;--frame:#3A2412;
+  --or:#FFA319;--or-ink:#A35400;--red:#C8322D;--peach:#FFD898;--straw:#E9B96A;--straw2:#D9A453;
+  --grid:rgba(58,36,18,.05);--stripe:rgba(58,36,18,.04);
+  --f-pix:'Pixelify Sans','Courier New',monospace;
+  --f-ui:'Nunito',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-mono:'Azeret Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#24160C;--panel:#332114;--ink:#FFF4E0;--soft:#EBD5B5;--mute:#B49576;--rule:#4D3322;--edge:#FFF4E0;--frame:#6E4A30;
+    --or:#FFA319;--or-ink:#FFBE55;--red:#E5484D;
+    --grid:rgba(255,255,255,.03);--stripe:rgba(255,255,255,.04);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#24160C;--panel:#332114;--ink:#FFF4E0;--soft:#EBD5B5;--mute:#B49576;--rule:#4D3322;--edge:#FFF4E0;--frame:#6E4A30;
+  --or:#FFA319;--or-ink:#FFBE55;--red:#E5484D;
+  --grid:rgba(255,255,255,.03);--stripe:rgba(255,255,255,.04);color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background-color:var(--bg);color:var(--ink);font:500 15.5px/1.55 var(--f-ui);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px dashed var(--or-ink);outline-offset:3px}
+.wrap{max-width:1420px;margin:0 auto;padding:16px}
+.panel{background:var(--panel);border:2px solid var(--frame)}
+.ph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0;padding:13px 18px;border-bottom:1.5px solid var(--rule);font:500 11.5px/1.2 var(--f-mono);letter-spacing:.07em;text-transform:uppercase}
+.ph small{font-weight:400;color:var(--mute);letter-spacing:.04em}
+.ph .pix{height:18px;width:auto}
+.ph .end{margin-left:auto}
+.pad{padding:18px}
+.tag{display:inline-block;font:600 10.5px/1 var(--f-mono);letter-spacing:.05em;padding:5px 7px;background:var(--ink);color:var(--bg);text-transform:uppercase}
+.tag.or{background:var(--or);color:#3A2412}
+.tag.ghost{background:transparent;color:var(--soft);border:1px solid var(--rule)}
+.pix rect{fill:var(--ink)} .pix .o{fill:var(--or)} .pix .r{fill:var(--red)} .pix .y{fill:#FFEE78} .pix .c{fill:#FFFAE2}
+.small{font-size:13px;color:var(--soft)}
+.warn{color:#B42318}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .warn{color:#FF9B8C}}
+:root[data-theme="dark"] .warn{color:#FF9B8C}
+.tile{background:var(--peach);display:block}
+.ck{display:block;width:100%;height:auto}
+
+/* header */
+.top{margin-bottom:16px}
+.nav{display:grid;grid-template-columns:auto 1fr auto}
+.brand{display:flex;align-items:center;gap:12px;padding:10px 18px;border-right:1.5px solid var(--rule);text-decoration:none}
+.brand .tile{width:50px;height:50px;padding:4px;border:2px solid var(--frame);flex:none}
+.brand b{display:block;font:700 30px/.9 var(--f-pix)}
+.brand small{display:block;margin-top:6px;font:400 11px/1 var(--f-mono);color:var(--mute);letter-spacing:.05em}
+.tabs{display:grid;grid-template-columns:repeat(6,minmax(100px,1fr));overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:15px 8px 12px;border-right:1.5px solid var(--rule);text-decoration:none;color:var(--soft);font:500 11px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.tabs a em{position:absolute;top:7px;right:8px;font-style:normal;color:var(--mute);font-size:10px}
+.tabs a .pix{height:22px;width:auto}
+.tabs a:hover{background:var(--stripe)}
+.tabs a[aria-current="page"]{color:var(--ink);box-shadow:inset 0 -4px 0 var(--or)}
+.walletcell{position:relative;display:flex;align-items:center;padding:12px 18px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font:900 14px/1.2 var(--f-ui);border:2px solid var(--edge);background:var(--panel);color:var(--ink);padding:11px 16px;cursor:pointer;box-shadow:3px 3px 0 var(--edge);text-decoration:none;white-space:nowrap}
+.btn:active:not([disabled]){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--edge)}
+.btn.or{background:var(--or);color:#3A2412;border-color:#3A2412}
+.btn.red{background:var(--red);color:#FFF;border-color:#3A2412}
+.btn.dark{background:var(--ink);color:var(--bg)}
+.btn.sm{padding:7px 11px;font-size:12.5px;box-shadow:2px 2px 0 var(--edge)}
+.btn.wide{width:100%;padding:18px;font-size:16px}
+.btn[disabled]{opacity:.4;cursor:not-allowed;box-shadow:none}
+.btn .dot{width:9px;height:9px;background:#3A2412;display:inline-block}
+.btn.connected .dot{background:var(--or);outline:1.5px solid var(--edge)}
+.chip{font:600 11px/1 var(--f-mono);letter-spacing:.03em;border:2px solid var(--edge);background:var(--panel);padding:7px 10px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--or);color:#3A2412;border-color:#3A2412}
+.chip[disabled]{opacity:.4;cursor:not-allowed}
+.link{font:900 13px/1 var(--f-ui);border:0;background:none;padding:3px 0;border-bottom:3px solid var(--or);cursor:pointer;text-decoration:none}
+
+/* barnyard */
+.grid-hero{display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);gap:16px;align-items:start}
+.col{display:grid;gap:16px;align-content:start;min-width:0}
+label,.lbl{display:block;font:400 11px/1.2 var(--f-mono);color:var(--soft);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.big{display:flex;align-items:baseline;gap:10px;margin:14px 0 6px}
+.big b{font:700 96px/.85 var(--f-pix)}
+.big span{font:600 22px var(--f-pix);color:var(--mute)}
+.kv4{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--rule);margin:14px 0 18px}
+.kv4>div{padding:12px 14px;border-right:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
+.kv4>div:nth-child(2n){border-right:0}
+.kv4>div:nth-last-child(-n+2){border-bottom:0}
+.kv4 b{font:600 16px/1.2 var(--f-mono)}
+.hero-copy{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:end;padding:26px 28px 6px}
+h1{font:700 clamp(38px,4.6vw,66px)/.95 var(--f-pix);margin:0}
+h1 em{font-style:normal;color:var(--or-ink)}
+.hero-copy p{font-size:16.5px;color:var(--soft);margin:0}
+.yardwrap{padding:14px 18px 0}
+.yard{display:block;width:100%;height:auto;border:2px solid var(--frame)}
+.yard .bob{animation:bob 1.2s steps(2) infinite}
+.yard .bob2{animation:bob 1.2s steps(2) infinite .6s}
+@keyframes bob{50%{transform:translateY(-1px)}}
+.yard g.c{cursor:help}
+.econ{display:grid;grid-template-columns:repeat(3,1fr);margin:16px 18px 0;border:2px solid var(--frame)}
+.econ>div{padding:14px 16px;border-right:1.5px solid var(--rule);position:relative}
+.econ>div:last-child{border-right:0}
+.econ b{display:block;font:700 30px/1 var(--f-pix);margin:4px 0}
+.econ span{font-size:13px;color:var(--soft)}
+.econ>div:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);background:var(--panel);font:700 16px var(--f-mono);padding:0 2px;z-index:1}
+.own{padding:16px 18px 18px}
+.own .sq{display:grid;grid-template-columns:repeat(50,1fr);gap:2px;margin:8px 0 10px}
+.own .sq i{aspect-ratio:1;display:block;outline:1px solid rgba(58,36,18,.35);outline-offset:-1px}
+.own .sq i.you{background:var(--red)!important;outline:2px solid var(--ink)}
+.own .keys{display:flex;flex-wrap:wrap;gap:6px 18px;font:400 12px var(--f-mono);color:var(--soft)}
+.own .keys span{display:inline-flex;align-items:center;gap:6px}
+.own .keys i{width:11px;height:11px;display:inline-block;outline:1px solid rgba(58,36,18,.4)}
+.kv2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.kv2>div{padding:14px 18px}
+.kv2>div+div{border-left:1.5px solid var(--rule)}
+.kv2 b{font:700 24px/1.1 var(--f-pix);overflow-wrap:anywhere}
+.btnrow{display:flex;gap:12px;padding:18px;border-top:1.5px solid var(--rule)}
+.btnrow .btn{flex:1}
+.feed{display:grid;grid-template-columns:repeat(6,1fr)}
+.feed>div{padding:18px 14px;text-align:center;border-right:1.5px solid var(--rule)}
+.feed>div:last-child{border-right:0}
+.feed .pix{height:34px;width:auto;margin:0 auto 10px;display:block}
+.feed b{display:block;font:700 20px var(--f-pix)}
+.feed p{margin:2px 0 6px;font-size:13px;color:var(--soft);line-height:1.35}
+.ago{font:400 11px var(--f-mono);color:var(--mute);letter-spacing:.04em;text-transform:uppercase}
+.empty{padding:28px 20px;color:var(--soft);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.empty .tile{width:52px;height:52px;padding:4px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr)}
+.steps>div{padding:20px 18px 24px;border-right:1.5px solid var(--rule)}
+.steps>div:last-child{border-right:0}
+.steps .pix{height:32px;width:auto;margin-bottom:14px}
+.steps .n{display:block;font:600 12px var(--f-mono);color:var(--or-ink);margin-bottom:6px}
+.steps h3{margin:0 0 6px;font:700 21px/1.1 var(--f-pix)}
+.steps p{margin:0;color:var(--soft);font-size:14.5px}
+.mt{margin-top:16px}
+
+/* mint */
+.grid-2{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;align-items:start}
+.step h3{font:700 30px/1.05 var(--f-pix);margin:0 0 8px}
+.step p{margin:0 0 16px;color:var(--soft);max-width:68ch}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.opt{text-align:left;border:2px solid var(--edge);background:var(--panel);padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.opt[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--or),4px 4px 0 var(--edge)}
+.opt .tile{width:72px;height:72px;padding:6px;border:1.5px solid var(--frame)}
+.opt b{font:700 20px/1.05 var(--f-pix);margin-top:10px}
+.opt dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0 0;font:400 12px var(--f-mono)}
+.opt dt{color:var(--mute)} .opt dd{margin:0;text-align:right}
+.note{font-size:13.5px;color:var(--soft);margin:14px 0 0;padding-left:12px;border-left:3px solid var(--or)}
+.youget{display:flex;gap:18px;align-items:center;padding:18px}
+.youget .tile{width:120px;height:120px;padding:10px;border:2px solid var(--frame);flex:none}
+.youget b{display:block;font:700 40px/1 var(--f-pix)}
+.youget span{color:var(--soft);font-size:14px}
+.rows>div{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:14px 18px;border-bottom:1.5px solid var(--rule)}
+.rows>div:last-child{border-bottom:0}
+.rows label{margin:0}
+.rows b{font:600 14.5px var(--f-mono);text-align:right}
+
+/* coop */
+.kv5{display:grid;grid-template-columns:repeat(5,1fr)}
+.kv5>div{padding:16px 18px;border-right:1.5px solid var(--rule)}
+.kv5>div:last-child{border-right:0}
+.kv5 b{display:block;font:600 20px/1.2 var(--f-mono)}
+.kv5 b.g{color:var(--or-ink)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;padding:18px;border-top:1.5px solid var(--rule)}
+.nest{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.egg{padding:16px;border-right:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule);display:flex;flex-direction:column;align-items:flex-start}
+.egg .pix{height:46px;width:auto;margin-bottom:8px}
+.egg b{font:700 22px var(--f-pix)}
+.egg p{margin:2px 0 12px;font-size:12.5px;color:var(--soft)}
+.egg .btns{margin-top:auto}
+.egg.slot{align-items:center;justify-content:center;color:var(--mute);font:400 12px var(--f-mono);min-height:150px;background:var(--stripe)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.crow{display:grid;grid-template-columns:110px minmax(0,1fr) minmax(0,1fr);border-top:1.5px solid var(--rule)}
+.crow:first-of-type{border-top:0}
+.crow>div{padding:16px 18px}
+.crow>div+div{border-left:1.5px solid var(--rule)}
+.crow .tile{width:100%;aspect-ratio:1;padding:8px;border:1.5px solid var(--frame)}
+.crow h3{margin:0 0 6px;font:700 26px/1 var(--f-pix);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin:8px 0 12px}
+.stats b{display:block;font:600 14.5px var(--f-mono)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.up{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:12px 18px;border-bottom:1.5px dashed var(--rule)}
+.up:last-child{border-bottom:0}
+.up b{font:900 14.5px var(--f-ui)}
+.up small{grid-column:1;font-size:12.5px;color:var(--soft)}
+.up .btn,.up .seg{grid-row:1 / span 2;grid-column:2}
+.pips{display:inline-flex;gap:3px;margin-left:8px;vertical-align:1px}
+.pips i{width:9px;height:9px;border:1.5px solid var(--edge);display:inline-block}
+.pips i.on{background:var(--or)}
+.rentbox{border:1.5px solid var(--rule);padding:12px 14px;background:var(--stripe)}
+.rentbox b{display:block;font:900 14.5px var(--f-ui);margin-bottom:2px}
+.rentbox p{margin:0 0 10px;font-size:13px;color:var(--soft)}
+.filters{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:16px 18px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.seg>span{font:400 11px var(--f-mono);color:var(--mute);letter-spacing:.05em;text-transform:uppercase;margin-right:4px}
+.lists{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+.lcard{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;padding:16px;border-right:1.5px solid var(--rule);border-bottom:1.5px solid var(--rule)}
+.lcard .tile{width:96px;height:96px;padding:8px;border:1.5px solid var(--frame)}
+.lcard h4{margin:0 0 6px;font:700 22px/1 var(--f-pix);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lcard dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 12px;font:400 11.5px var(--f-mono)}
+.lcard dt{color:var(--mute)} .lcard dd{margin:0;text-align:right}
+.lcard .btn{width:100%;white-space:normal;text-align:center}
+
+/* how */
+.split{padding:22px 22px 6px}
+.squares{display:grid;grid-template-columns:repeat(50,1fr);gap:2px}
+.squares i{aspect-ratio:1;display:block}
+.sq-a{background:var(--or)} .sq-b{background:var(--ink)} .sq-c{background:var(--mute);opacity:.5}
+.splitkeys{display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--rule);margin-top:18px}
+.splitkeys>div{padding:16px 22px;border-right:1.5px solid var(--rule)}
+.splitkeys>div:last-child{border-right:0}
+.splitkeys .k{display:flex;gap:8px;align-items:center;font:900 15px var(--f-ui)}
+.splitkeys .k i{width:13px;height:13px;display:inline-block}
+.splitkeys b{display:block;font:700 54px/1 var(--f-pix);margin:8px 0 4px}
+.splitkeys p{margin:0;color:var(--soft);font-size:14px}
+.strat{display:grid;grid-template-columns:1fr 1fr}
+.strat>div{padding:20px 22px}
+.strat>div+div{border-left:1.5px solid var(--rule)}
+.strat h3{font:700 26px var(--f-pix);margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.strat .pix{height:30px;width:auto}
+.strat p{margin:0;color:var(--soft)}
+.backed{margin:0;padding:18px 22px;background:var(--stripe);border-top:1.5px solid var(--rule);font-size:15px}
+.backed b{font-weight:900}
+.fly{padding:10px 18px 18px}
+.fly svg{display:block;width:100%;height:auto;max-width:900px;margin:0 auto}
+.fly .ringe{fill:none;stroke:var(--mute);stroke-width:1.5;stroke-dasharray:5 5}
+.fly .node rect{fill:var(--panel);stroke:var(--edge);stroke-width:2}
+.fly .node.hot rect{fill:var(--or);stroke:#3A2412}
+.fly .node text{font:800 13px var(--f-ui);fill:var(--ink)}
+.fly .node.hot text{fill:#3A2412}
+.fly .arr{fill:var(--mute)}
+.fly ol{display:none;margin:0;padding:0 0 0 22px}
+.fly ol li{padding:6px 0;font-weight:800}
+.pbody{padding:18px 22px}
+.pbody p{margin:0 0 10px;color:var(--soft)}
+.pbody p:last-child{margin:0}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{font:400 11px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--soft);text-align:left;padding:10px 14px;border-bottom:1.5px solid var(--rule);background:var(--stripe)}
+td{padding:12px 14px;border-bottom:1.5px solid var(--rule);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;font-family:var(--f-mono)}
+td .tile{width:40px;height:40px;padding:3px;border:1.5px solid var(--frame)}
+.tw{overflow-x:auto}
+
+/* docs */
+.docs{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.toc ol{list-style:none;margin:0;padding:8px 18px 14px}
+.toc li button{display:flex;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1.5px solid var(--rule);padding:10px 0;cursor:pointer;font-size:14.5px;font-weight:700}
+.toc li button span{font:400 11px var(--f-mono);color:var(--mute);padding-top:3px}
+.doc{scroll-margin-top:16px}
+.doc .body{padding:20px 24px 24px;max-width:80ch}
+.doc .body p,.doc .body li{color:var(--soft)}
+.doc .body strong{color:var(--ink)}
+.doc .body h4{font:700 20px var(--f-pix);margin:20px 0 6px}
+.doc code{font:400 12.5px var(--f-mono);background:var(--stripe);padding:2px 5px}
+.doc .tw{margin:12px 0;border:1.5px solid var(--rule)}
+details{border-bottom:1.5px solid var(--rule)}
+details summary{cursor:pointer;padding:13px 0;font-weight:900;list-style:none}
+details summary::before{content:"▸";display:inline-block;width:18px;font-size:12px}
+details[open] summary::before{content:"▾"}
+details p{margin:0 0 14px 18px}
+
+/* overlays */
+.scrim{position:fixed;inset:0;background:rgba(36,22,12,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{max-width:640px;width:100%;max-height:calc(100% - 32px);overflow:auto;box-shadow:6px 6px 0 var(--or)}
+.x{margin-left:auto;background:none;border:0;font:700 18px var(--f-mono);cursor:pointer;padding:0 4px}
+.wlist{display:grid;gap:10px;padding:18px}
+.wopt{display:flex;align-items:center;gap:14px;border:2px solid var(--edge);background:var(--panel);padding:12px 14px;cursor:pointer;text-align:left;font:900 15px var(--f-ui);text-decoration:none}
+.wopt img,.wopt .ph-ico{width:28px;height:28px;flex:none}
+.wopt .ph-ico{background:var(--mute)}
+.wopt em{margin-left:auto;font:400 11px var(--f-mono);font-style:normal;color:var(--or-ink);text-transform:uppercase;letter-spacing:.05em}
+.wopt:hover{background:var(--stripe)}
+.menu{position:absolute;right:18px;top:calc(100% - 4px);z-index:40;min-width:260px;box-shadow:4px 4px 0 var(--or)}
+.menu .rows>div{padding:12px 16px}
+.mitems{display:grid;border-top:1.5px solid var(--rule)}
+.mitems button,.mitems a{text-align:left;background:none;border:0;border-bottom:1.5px solid var(--rule);padding:12px 16px;cursor:pointer;font:800 14px var(--f-ui);text-decoration:none}
+.mitems>*:last-child{border-bottom:0}
+.toasts{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;z-index:60;max-width:min(380px,calc(100% - 32px))}
+.toast{background:var(--ink);color:var(--bg);padding:12px 16px;font:700 14px var(--f-ui);box-shadow:4px 4px 0 var(--or)}
+footer{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;padding:22px 2px 36px;font-size:13px;color:var(--soft)}
+
+@media (max-width:1200px){
+  .grid-hero{grid-template-columns:minmax(0,1fr)}
+  .grid-hero>.hero{order:-1}
+  .grid-2{grid-template-columns:minmax(0,1fr)}
+  .opts{grid-template-columns:1fr 1fr}
+  .feed{grid-template-columns:repeat(3,1fr)}
+  .feed>div:nth-child(3n){border-right:0}
+  .feed>div:nth-child(-n+3){border-bottom:1.5px solid var(--rule)}
+  .steps{grid-template-columns:1fr 1fr}
+  .steps>div{border-bottom:1.5px solid var(--rule)}
+  .crow{grid-template-columns:110px minmax(0,1fr)}
+  .crow>div:last-child{grid-column:1 / -1;border-left:0;border-top:1.5px solid var(--rule)}
+  .docs{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static}
+  .kv5{grid-template-columns:repeat(3,1fr)}
+  .kv5>div:nth-child(3){border-right:0}
+  .kv5>div:nth-child(-n+3){border-bottom:1.5px solid var(--rule)}
+}
+@media (max-width:1100px){
+  .nav{grid-template-columns:1fr auto}
+  .brand{border-right:0}
+  .tabs{grid-column:1 / -1;grid-row:2;display:flex;border-top:1.5px solid var(--rule)}
+  .tabs a{flex:1 0 100px}
+}
+@media (max-width:760px){
+  .hero-copy{grid-template-columns:minmax(0,1fr);padding:24px 20px 6px}
+  .econ{grid-template-columns:minmax(0,1fr)}
+  .econ>div{border-right:0;border-bottom:1.5px solid var(--rule)}
+  .econ>div:last-child{border-bottom:0}
+  .econ>div:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-12px;transform:translateX(-50%)}
+  .own .sq{grid-template-columns:repeat(25,1fr)}
+  .strat{grid-template-columns:minmax(0,1fr)}
+  .strat>div+div{border-left:0;border-top:1.5px solid var(--rule)}
+}
+@media (max-width:700px){
+  .wrap{padding:10px}
+  .opts,.two{grid-template-columns:minmax(0,1fr)}
+  .feed{grid-template-columns:1fr 1fr}
+  .feed>div{border-bottom:1.5px solid var(--rule)}
+  .feed>div:nth-child(2n){border-right:0}
+  .feed>div:nth-child(3n){border-right:1.5px solid var(--rule)}
+  .feed>div:nth-child(6n){border-right:0}
+  .steps{grid-template-columns:1fr}
+  .steps>div{border-right:0}
+  .kv5{grid-template-columns:1fr 1fr}
+  .kv5>div{border-right:1.5px solid var(--rule)!important;border-bottom:1.5px solid var(--rule)}
+  .kv5>div:nth-child(2n){border-right:0!important}
+  .splitkeys{grid-template-columns:1fr}
+  .splitkeys>div{border-right:0;border-bottom:1.5px solid var(--rule)}
+  .squares{grid-template-columns:repeat(25,1fr)}
+  .fly svg{display:none} .fly ol{display:block}
+  .big b{font-size:78px}
+  .kv2 b{font-size:20px}
+  .brand{padding:8px 12px;gap:8px}
+  .brand .tile{width:40px;height:40px}
+  .brand b{font-size:23px}
+  .walletcell{padding:10px 12px}
+  .walletcell .btn{padding:9px 10px;font-size:12.5px;gap:7px}
+  .crow{grid-template-columns:90px minmax(0,1fr)}
+  .lists{grid-template-columns:minmax(0,1fr)}
+  .up{grid-template-columns:minmax(0,1fr)}
+  .up .btn,.up .seg{grid-row:auto;grid-column:1;justify-self:start;margin-top:6px}
+}
+@media (prefers-reduced-motion:reduce){
+  .yard .bob,.yard .bob2{animation:none}
+  .btn:active:not([disabled]){transform:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="sprites"></defs></svg>
+
+<div class="wrap">
+  <header class="top panel">
+    <div class="nav">
+      <a class="brand" href="#yard" aria-label="Incubate home">
+        <span class="tile"><svg class="ck" viewBox="0 0 26 31" shape-rendering="crispEdges" aria-hidden="true"><use href="#ck0"/></svg></span>
+        <span><b>Incubate</b><small>$INCUBATE</small></span>
+      </a>
+      <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+      <div class="walletcell">
+        <button class="btn or" id="walletBtn" data-act="wallet" aria-haspopup="true"><i class="dot"></i><span>Connect wallet</span></button>
+        <div class="menu panel" id="walletMenu" hidden></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="view" tabindex="-1"></main>
+
+  <footer>
+    <span>Incubate. Hatch chickens. Lay eggs. Harvest yield.</span>
+    <span>Chickens, eggs, $INCUBATE and every coin launched here can go to zero. Nothing here is financial advice.</span>
+  </footer>
+</div>
+
+<div id="overlay"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ---------- logo pixel grid with its own palette ---------- */
+const CHICK = {"pal": ["#240549", "#FE91A4", "#E82245", "#D11234", "#FF9801", "#FFFAE2", "#FFEE78", "#A192AF", "#FE5722", "#CFB286"], "rows": ["............aa............", "..........aabbaa..........", ".........abbccbba.........", ".........acccccca.........", "........addccccdda........", "........aaaddddaaa........", ".......aeeeaddaeeea.......", "......afgggeaaegggfa......", ".....afgggggeegggggfa.....", "....afgaaaggggggaaagfa....", "....afaaafaggggafaaafa....", "...afgaahaaggggaahaagfa...", "...afgaaaaaggggaaaaagfa...", "..afgggaaaggaaggaaagggfa..", "..aggggggggafeagggggggga..", ".aggggggggaeeeeagggggggga.", "agggggggggaieeiaggggggggga", "aegggagggggaiiagggggagggea", "aeggeaggggggaaggggggaeggea", "aeeeaeggggggggggggggeaeeea", ".aaaeeeeggggggggggeeeeaaa.", "....aeeeeggggggggeeeea....", ".....aaeeeeeeeeeeeeaa.....", ".......aaeeeeeeeeaa.......", "........aaaaaaaaaa........", ".....jjjaiajjjjaiajjj.....", "....jjjjaeajjjjaeajjjj....", "...jjjjaefeajjaefeajjjj...", "....jjjjaaajjjjaaajjjj....", ".....jjjjjjjjjjjjjjjj.....", "........jjjjjjjjjj........"]};
+
+/* ---------- config ---------- */
+const DAY = 86400, HOUR = 3600;
+const CFG = {
+  RPC: 'https://api.mainnet-beta.solana.com', // swap for your own RPC (Helius, Triton…) when you deploy
+  X: 'https://x.com/IncubateDotLive',
+  POOL: 0.60, BURN: 0.25, OPS: 0.15,
+  RENT_OWNER: 0.90, RENT_BURN: 0.10,
+  LAUNCH_RATE: 1 / 15, FUND_LAUNCH_AT: 0.05,
+  LAY_H: 4, MIN_HATCH: 0.005,
+  PRICE0: 0.0000012, TOKEN_SUPPLY: 1e9,
+  START_T: 2 * DAY + 9 * HOUR,
+  OTHER_RATE: 3 / 1440
+};
+const TIERS = [
+  { name: 'Common Hen', short: 'Common', w: 1, price: 0.15, supply: 600, odds: 0.80, body: '#FFEE78', shade: '#FF9801', hi: '#FFFAE2' },
+  { name: 'Rare Hen', short: 'Rare', w: 2, price: 0.30, supply: 250, odds: 0.15, body: '#EEEAF6', shade: '#ABA2C6', hi: '#FFFFFF' },
+  { name: 'Golden Hen', short: 'Golden', w: 5, price: 0.75, supply: 120, odds: 0.045, body: '#FFB81C', shade: '#C46A00', hi: '#FFE58A' },
+  { name: 'Legendary Rooster', short: 'Legendary', w: 10, price: 1.50, supply: 30, odds: 0.005, body: '#FF8A3D', shade: '#B93A0B', hi: '#FFD3B0' }
+];
+const UP = {
+  nest:  { name: 'Nest capacity', max: 5, cost: l => 6000 * l, eff: l => `Holds ${3 + 2 * (l - 1)} eggs, next level ${3 + 2 * l}` },
+  speed: { name: 'Laying speed', max: 5, cost: l => 5000 * l, eff: () => 'Each level lays 15% sooner' }
+};
+const AUTO_COST = 20000;
+const DURS = [{ h: 1, name: '1 hour', off: 0 }, { h: 24, name: '1 day', off: 0.10 }, { h: 168, name: '1 week', off: 0.25 }];
+const NARR = { a: ['Capybara','Frog','Goose','Hamster','Penguin','Raccoon','Otter','Pigeon','Axolotl','Walrus','Yolk','Nugget','Feather','Clucky','Peep','Omelet','Scramble','Coop','Henny','Chirp'], b: ['Council','Summer','Army','Season','Parade','Club','Rally','Nest','Flock','Farm','Hatch','Coop','Roost','Party','Gang'] };
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function mulberry(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gauss(r = Math.random){ let u = 0, v = 0; while (!u) u = r(); while (!v) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+const pick = (arr, r = Math.random) => arr[Math.floor(r() * arr.length)];
+const fmtSol = x => { x = +x || 0; return x >= 100 ? x.toFixed(1) : x >= 1 ? x.toFixed(2) : x >= 0.01 ? x.toFixed(3) : x > 0 ? x.toFixed(4) : '0'; };
+const fmtTok = x => { x = +x || 0; if (x >= 1e9) return (x/1e9).toFixed(2) + 'B'; if (x >= 1e6) return (x/1e6).toFixed(x >= 1e7 ? 1 : 2) + 'M'; if (x >= 1e3) return (x/1e3).toFixed(x >= 1e4 ? 0 : 1) + 'k'; return Math.round(x) + ''; };
+const pad2 = n => String(n).padStart(2, '0');
+function ago(t){ const s = S.t - t; if (s < 60) return 'just now'; if (s < HOUR) return Math.floor(s / 60) + ' min ago'; if (s < DAY) return `${Math.floor(s / HOUR)} h ${Math.floor(s % HOUR / 60)} min ago`; return Math.floor(s / DAY) + ' d ago'; }
+function left(t){ const s = Math.max(0, t - S.t); if (s < HOUR) return Math.max(1, Math.ceil(s / 60)) + ' min'; if (s < DAY) return `${Math.floor(s / HOUR)} h ${Math.floor(s % HOUR / 60)} min`; return `${Math.floor(s / DAY)} d ${Math.floor(s % DAY / HOUR)} h`; }
+const short = a => a ? a.slice(0, 4) + '…' + a.slice(-4) : '';
+const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const randAddr = r => Array.from({ length: 44 }, () => B58[Math.floor(r() * 58)]).join('');
+const price = () => CFG.PRICE0 * (1 + S.burned / CFG.TOKEN_SUPPLY * 40);
+const r50 = x => Math.max(50, Math.round(x / 50) * 50);
+
+/* ---------- sprites: the logo, recoloured per tier ---------- */
+(function buildSprites(){
+  const sym = 'abcdefghij';
+  const base = CHICK.pal;
+  let defs = '';
+  TIERS.forEach((t, ti) => {
+    const pal = base.slice();
+    pal[sym.indexOf('g')] = t.body; pal[sym.indexOf('e')] = t.shade; pal[sym.indexOf('f')] = t.hi;
+    let r = '';
+    CHICK.rows.forEach((row, y) => { let x = 0; while (x < row.length) { const ch = row[x]; if (ch !== '.') { const s = x; while (x < row.length && row[x] === ch) x++; r += `<rect x="${s}" y="${y}" width="${x - s}" height="1" fill="${pal[sym.indexOf(ch)]}"${ch === 'j' ? ' opacity=".55"' : ''}/>`; } else x++; } });
+    if (ti === 2) r += `<rect x="2" y="3" width="1" height="1" fill="#FFF7C2"/><rect x="23" y="6" width="1" height="1" fill="#FFF7C2"/><rect x="1" y="11" width="1" height="1" fill="#FFF7C2"/>`;
+    if (ti === 3) r += `<rect x="11" y="-1" width="4" height="1" fill="${base[0]}"/>`;
+    defs += `<g id="ck${ti}">${r}</g>`;
+  });
+  defs += `<g id="egg"><rect x="2" y="0" width="2" height="1" fill="#3A2412"/><rect x="1" y="1" width="1" height="1" fill="#3A2412"/><rect x="4" y="1" width="1" height="1" fill="#3A2412"/><rect x="0" y="2" width="1" height="3" fill="#3A2412"/><rect x="5" y="2" width="1" height="3" fill="#3A2412"/><rect x="1" y="5" width="4" height="1" fill="#3A2412"/><rect x="2" y="1" width="2" height="1" fill="#FFFAE2"/><rect x="1" y="2" width="4" height="3" fill="#FFFAE2"/><rect x="4" y="3" width="1" height="2" fill="#F2E3BE"/></g>`;
+  document.getElementById('sprites').innerHTML = defs;
+})();
+const ckTile = (tier, cls = '') => `<span class="tile ${cls}" role="img" aria-label="${TIERS[tier].name}"><svg class="ck" viewBox="0 -1 26 32" shape-rendering="crispEdges" aria-hidden="true"><use href="#ck${tier}"/></svg></span>`;
+const EGG = `<svg class="pix" viewBox="0 0 6 6" shape-rendering="crispEdges" aria-hidden="true"><use href="#egg"/></svg>`;
+function pix(rows){
+  const h = rows.length, w = rows[0].length; let r = '';
+  rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === '#') r += `<rect x="${x}" y="${y}" width="1" height="1"/>`; else if ('oryc'.includes(c)) r += `<rect class="${c}" x="${x}" y="${y}" width="1" height="1"/>`; }));
+  return `<svg class="pix" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;
+}
+const ICO = {
+  yard: pix(['...rr....','..#yy#...','.#yyyy#..','.#y#y#y#.','.#yyoo#..','..####...','ooooooooo']),
+  mint: pix(['...##...','..#cc#..','.#cccc#.','.#cccc#.','.#ccco#.','..####..','........','.oooooo.']),
+  coop: pix(['....#....','...###...','..#####..','.#.....#.','.#.ccc.#.','.#.ccc.#.','.#######.']),
+  rent: pix(['.###.....','#...#....','#.o.#####','#...#.#.#','.###.....']),
+  how: pix(['###...###','#o##.##o#','#..#.#..#','#.##.##.#','#..#.#..#','###.#.###']),
+  docs: pix(['######..','#....##.','#.oo..##','#......#','#.####.#','#......#','#.####.#','########']),
+  coin: pix(['..###..','.#ooo#.','#oo#oo#','#o###o#','#oo#oo#','.#ooo#.','..###..']),
+  crack: pix(['..##..','.#cc#.','#c#c.#','#.#.c#','#cc#c#','.####.']),
+  hatch: pix(['..rr..','.#yy#.','#y#y##','#yyoo#','#c.c.#','.####.'])
+};
+
+/* ---------- state ---------- */
+const KEY = 'incubate-state-v1', KEYW = 'incubate-wallet-v1';
+let S, ckById = new Map();
+function reindex(){ ckById = new Map(S.ck.map(c => [c.id, c])); }
+function feedPush(x){ x.t = S.t; S.feed.unshift(x); if (S.feed.length > 60) S.feed.length = 60; }
+const totalW = () => S.ck.reduce((a, c) => a + TIERS[c.tier].w, 0);
+const poolRate = () => Math.max(0.05, S.pool24 / 24);
+const layInt = c => CFG.LAY_H * HOUR * (c.user ? Math.pow(0.85, S.coop.speed - 1) : 1);
+const nestCap = () => 3 + 2 * (S.coop.nest - 1);
+const fair = (c, share) => r50(0.75 * share * poolRate() * TIERS[c.tier].w / totalW() / price());
+const hatchCost = () => Math.min(30000, 6000 + 1500 * myCk().length);
+
+function newChicken(tier, owner, user, r = Math.random, hatched = false){
+  const c = { id: S.nextCk++, tier, owner, user, acc: 0, next: S.t + layInt({ user }) * (user ? 0.3 : r()), eggs: 0, earned: 0, rentUn: 0, list: null, rent: null, t: S.t, hatched };
+  if (!user && r() < 0.1) c.list = { share: pick([0.5, 0.6, 0.7, 0.8], r), k: 0.8 + r() * 0.6, price: 0 };
+  S.ck.push(c); ckById.set(c.id, c);
+  if (c.list) c.list.price = fair(c, c.list.share);
+  return c;
+}
+function rollTier(r = Math.random){ const x = r(); let a = 0; for (let i = 3; i >= 0; i--) { a += TIERS[i].odds; if (x < a) return i; } return 0; }
+function addOther(r){
+  const x = r(), tier = x < 0.66 ? 0 : x < 0.9 ? 1 : x < 0.98 ? 2 : 3;
+  if (S.minted[tier] >= TIERS[tier].supply) return;
+  S.minted[tier]++;
+  const fee = TIERS[tier].price;
+  S.burnSol += fee * 0.5; S.burned += fee * 0.5 / price(); S.fund += fee * 0.5;
+  newChicken(tier, randAddr(r), false, r);
+}
+function launchCoin(funded){
+  const a = pick(NARR.a), b = pick(NARR.b);
+  const c = { id: S.nextCoin++, tick: (a.slice(0, 4) + b.slice(0, 1 + Math.floor(Math.random() * 3))).toUpperCase(), t0: S.t, F: Math.exp(Math.log(0.07) + 1.4 * gauss()), L: Math.exp(Math.log(120) + 0.9 * gauss()), fees: 0, alive: true, funded };
+  S.coins.push(c); S.launches++;
+  feedPush({ k: 'launch', tick: c.tick, funded });
+  S.ver++;
+}
+function distribute(p){
+  const W = totalW(); if (!W) return;
+  for (const c of S.ck) {
+    const share = p * TIERS[c.tier].w / W;
+    c.earned += share;
+    if (c.rent) { const rs = share * c.rent.share; if (c.rent.user) c.rentUn += rs; c.acc += share - rs; }
+    else c.acc += share;
+  }
+}
+function crack(egg){ S.wal.sol += egg.v; S.cracked++; S.nest = S.nest.filter(x => x !== egg); }
+function hatch(egg){
+  const cost = hatchCost();
+  if (egg.v < CFG.MIN_HATCH || S.wal.inc < cost) return null;
+  S.wal.inc -= cost; S.burned += cost;
+  S.fund += egg.v; S.nest = S.nest.filter(x => x !== egg);
+  const tier = rollTier();
+  const c = newChicken(tier, W.addr, true, Math.random, true);
+  S.hatched++;
+  feedPush({ k: 'hatch', tier, user: true });
+  return c;
+}
+function startRent(c, who, isUser, hours, cost, share){
+  c.rent = { who, user: isUser, until: S.t + hours * HOUR, share, hours }; c.rentUn = 0;
+  S.burned += cost * CFG.RENT_BURN;
+  if (c.user && !isUser) { S.wal.inc += cost * CFG.RENT_OWNER; toast(`${TIERS[c.tier].short} #${c.id} rented for ${hours === 1 ? '1 hour' : hours === 24 ? '1 day' : '1 week'}: +${fmtTok(cost * CFG.RENT_OWNER)} $INCUBATE`); }
+  S.ver++;
+}
+function endRent(c){
+  if (c.rent.user && c.rentUn > 0) { S.wal.sol += c.rentUn; toast(`Rental of chicken #${c.id} ended. ${fmtSol(c.rentUn)} SOL settled to your wallet.`); }
+  c.rentUn = 0; c.rent = null; S.ver++;
+}
+function step(dm){
+  const t0 = S.t; S.t += dm * 60;
+  if (Math.random() < dm * CFG.OTHER_RATE) { addOther(Math.random); S.ver++; }
+  if (Math.random() < dm * CFG.LAUNCH_RATE) launchCoin(false);
+  while (S.fund >= CFG.FUND_LAUNCH_AT) { S.fund -= CFG.FUND_LAUNCH_AT; launchCoin(true); }
+  let pool = 0;
+  for (const c of S.coins) {
+    if (!c.alive) continue;
+    const a0 = Math.max(0, (t0 - c.t0) / 60), a1 = Math.max(0, (S.t - c.t0) / 60);
+    const f = c.F * (Math.exp(-a0 / c.L) - Math.exp(-a1 / c.L));
+    if (f > 0) { c.fees += f; pool += f * CFG.POOL; S.burnSol += f * CFG.BURN; S.burned += f * CFG.BURN / price(); S.ops += f * CFG.OPS; }
+    if (a1 > 3 * c.L) { c.alive = false; S.ver++; }
+  }
+  S.pool24 = S.pool24 * Math.exp(-dm * 60 / DAY) + pool;
+  distribute(pool);
+  const born = [];
+  for (const c of S.ck) {
+    if (c.rent && S.t >= c.rent.until) endRent(c);
+    if (c.list && !c.rent && Math.random() < dm / 1100 * Math.max(0.05, Math.min(3, fair(c, c.list.share) / c.list.price))) {
+      const x = Math.random(), d = DURS[x < 0.5 ? 0 : x < 0.9 ? 1 : 2]; startRent(c, randAddr(Math.random), false, d.h, c.list.price * d.h * (1 - d.off), c.list.share);
+    }
+    if (S.t < c.next) continue;
+    if (c.user) {
+      if (!isMine(c)) { c.next = S.t + 600; continue; }
+      if (S.nest.length >= nestCap()) { c.next = S.t + 600; continue; }
+      const egg = { id: S.nextEgg++, v: c.acc, by: c.id, tier: c.tier, t: S.t };
+      c.acc = 0; c.eggs++; c.next = S.t + layInt(c); S.nest.push(egg); S.laid++; S.ver++;
+      if (S.coop.auto) {
+        if (S.coop.mode === 'harvest') { crack(egg); if (S.speed <= 60) toast(`Auto-harvest cracked an egg from #${c.id}: +${fmtSol(egg.v)} SOL`); }
+        else { const n = hatch(egg); if (n && S.speed <= 60) toast(`Auto-compound hatched a ${TIERS[n.tier].name}`); }
+      } else if (S.speed <= 60) toast(`${TIERS[c.tier].short} #${c.id} laid an egg worth ${fmtSol(egg.v)} SOL`);
+    } else {
+      S.laid++; c.eggs++;
+      if (c.acc >= CFG.MIN_HATCH && Math.random() < 0.012) { S.fund += c.acc; born.push([rollTier(), c.owner]); S.hatched++; }
+      else S.cracked++;
+      c.acc = 0; c.next = S.t + layInt(c);
+    }
+  }
+  for (const [tier, owner] of born) { newChicken(tier, owner, false, Math.random, true); feedPush({ k: 'hatch', tier }); S.ver++; }
+  if (Math.floor(S.t / HOUR) !== Math.floor(t0 / HOUR)) {
+    S.coins = S.coins.filter(c => c.alive || c.t0 > S.t - 10 * HOUR);
+    for (const c of S.ck) if (c.list && !c.user) c.list.price = r50(fair(c, c.list.share) * c.list.k);
+  }
+}
+function advance(minutes){ while (minutes > 0) { const d = Math.min(5, minutes); step(d); minutes -= d; } }
+function newWorld(){
+  S = { v: 1, t: CFG.START_T - 2 * DAY, speed: 60, ck: [], coins: [], feed: [], nest: [], burned: 0, burnSol: 0, ops: 0, fund: 0, pool24: 0, launches: 0, laid: 0, cracked: 0, hatched: 0,
+    minted: [0, 0, 0, 0], wal: { sol: 30, inc: 200000 }, coop: { nest: 1, speed: 1, auto: false, mode: 'harvest' }, nextCoin: 1, nextCk: 1, nextEgg: 1, ver: 0 };
+  ckById = new Map();
+  const r = mulberry(73);
+  for (let i = 0; i < 46; i++) addOther(r);
+  advance(2 * 24 * 60);
+  S.feed = S.feed.slice(0, 40);
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 1 && Array.isArray(s.ck)) { S = s; reindex(); return; } } } catch (e) {}
+  newWorld();
+}
+
+/* ---------- wallet (Wallet Standard + injected providers, validated with @solana/web3.js) ---------- */
+const W = { list: [], addr: null, name: null, entry: null, kind: null, balance: null };
+const isMine = c => !!(c && c.user && W.addr && c.owner === W.addr);
+const isRenting = c => !!(c && c.rent && c.rent.user && W.addr && c.rent.who === W.addr);
+function addWallet(x){ if (!W.list.some(w => w.name.toLowerCase() === x.name.toLowerCase())) W.list.push(x); }
+const wsApi = { register: (...ws) => { ws.forEach(w => { try { if (w.features && w.features['standard:connect'] && (w.chains || []).some(c => String(c).startsWith('solana:'))) addWallet({ name: w.name, icon: w.icon, kind: 'standard', w }); } catch (e) {} }); return () => {}; } };
+try {
+  window.addEventListener('wallet-standard:register-wallet', ev => { try { ev.detail(wsApi); } catch (e) {} });
+  window.dispatchEvent(new CustomEvent('wallet-standard:app-ready', { detail: wsApi }));
+} catch (e) {}
+function detectInjected(){
+  const c = [['Phantom', window.phantom && window.phantom.solana], ['Solflare', window.solflare], ['Backpack', window.backpack], ['Solana wallet', window.solana]];
+  for (const [n, p] of c) {
+    if (!p || typeof p.connect !== 'function') continue;
+    const name = p.isPhantom ? 'Phantom' : p.isSolflare ? 'Solflare' : n;
+    if (!W.list.some(w => w.name.toLowerCase().startsWith(name.toLowerCase()))) addWallet({ name, icon: null, kind: 'injected', p });
+  }
+}
+function validAddr(a){
+  try { if (window.solanaWeb3 && solanaWeb3.PublicKey) return new solanaWeb3.PublicKey(a).toBase58(); } catch (e) { return null; }
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a) ? a : null;
+}
+async function connectEntry(entry, silent){
+  let addr = null;
+  if (entry.kind === 'standard') {
+    const w = entry.w;
+    if (silent) { if (w.accounts && w.accounts.length) addr = w.accounts[0].address; else return false; }
+    else { const r = await w.features['standard:connect'].connect(); const acc = (r && r.accounts && r.accounts.length ? r.accounts : w.accounts)[0]; addr = acc && acc.address; }
+    try { w.features['standard:events'] && w.features['standard:events'].on('change', ({ accounts }) => { if (accounts && accounts.length) setWallet(accounts[0].address, entry); else clearWallet(); }); } catch (e) {}
+  } else {
+    const p = entry.p;
+    const r = await p.connect(silent ? { onlyIfTrusted: true } : undefined);
+    const pk = (r && r.publicKey) || p.publicKey; addr = pk && pk.toString();
+    try { p.on && p.on('accountChanged', pk => { if (pk) setWallet(pk.toString(), entry); else clearWallet(); }); } catch (e) {}
+  }
+  if (!addr) throw new Error('The wallet returned no account.');
+  setWallet(addr, entry);
+  return true;
+}
+function setWallet(addr, entry){
+  const ok = validAddr(addr);
+  if (!ok) { toast('That wallet returned an invalid Solana address.'); return; }
+  W.addr = ok; W.name = entry ? entry.name : 'Guest wallet'; W.entry = entry || null; W.kind = entry ? entry.kind : 'guest'; W.balance = null;
+  try { localStorage.setItem(KEYW, JSON.stringify({ name: W.name, kind: W.kind, addr: W.kind === 'guest' ? W.addr : null })); } catch (e) {}
+  for (const c of S.ck) { if (c.user) c.owner = W.addr; if (c.rent && c.rent.user) c.rent.who = W.addr; }
+  paintWallet(); S.ver++; render(true);
+  if (W.kind !== 'guest') fetchBalance();
+}
+async function fetchBalance(){
+  if (!window.solanaWeb3 || !W.addr) return;
+  try {
+    const conn = new solanaWeb3.Connection(CFG.RPC, 'confirmed');
+    const lamports = await Promise.race([conn.getBalance(new solanaWeb3.PublicKey(W.addr)), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))]);
+    W.balance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+  } catch (e) { W.balance = 'unavailable'; }
+  paintWallet();
+}
+async function clearWallet(){
+  const e = W.entry;
+  try { if (e && e.kind === 'standard' && e.w.features['standard:disconnect']) await e.w.features['standard:disconnect'].disconnect(); if (e && e.kind === 'injected' && e.p.disconnect) await e.p.disconnect(); } catch (err) {}
+  Object.assign(W, { addr: null, name: null, entry: null, kind: null, balance: null });
+  try { localStorage.removeItem(KEYW); } catch (err) {}
+  $('#walletMenu').hidden = true; paintWallet(); S.ver++; render(true);
+}
+function paintWallet(){
+  const b = $('#walletBtn');
+  if (W.addr) { b.className = 'btn connected'; b.innerHTML = `<i class="dot"></i><span>${short(W.addr)}</span>`; b.setAttribute('aria-label', `Wallet ${W.addr}, open menu`); }
+  else { b.className = 'btn or'; b.innerHTML = `<i class="dot"></i><span>Connect wallet</span>`; b.setAttribute('aria-label', 'Connect wallet'); }
+  if (W.addr) {
+    const bal = W.kind === 'guest' ? fmtSol(S.wal.sol) + ' SOL' : W.balance == null ? 'Checking…' : W.balance === 'unavailable' ? 'Unavailable' : fmtSol(W.balance) + ' SOL';
+    $('#walletMenu').innerHTML = `<div class="rows"><div><label>Wallet</label><b>${esc(W.name)}</b></div><div><label>Address</label><b>${short(W.addr)}</b></div><div><label>Balance</label><b>${bal}</b></div><div><label>$INCUBATE</label><b>${fmtTok(S.wal.inc)}</b></div></div>
+      <div class="mitems"><button data-act="copyAddr">Copy address</button>${W.kind !== 'guest' ? `<a href="https://solscan.io/account/${W.addr}" target="_blank" rel="noopener">View on Solscan</a>` : ''}<button data-act="disconnect">Disconnect</button></div>`;
+  }
+}
+function openWalletModal(){
+  detectInjected();
+  const items = W.list.map((w, i) => `<button class="wopt" data-act="pickWallet" data-i="${i}">${w.icon ? `<img src="${esc(w.icon)}" alt="">` : `<span class="ph-ico"></span>`}<span>${esc(w.name)}</span><em>Detected</em></button>`).join('');
+  modal(`<section class="panel modal" role="dialog" aria-modal="true" aria-labelledby="wt">
+    <h2 class="ph" id="wt">${ICO.coop} Connect a Solana wallet <button class="x" data-act="close" aria-label="Close">×</button></h2>
+    <div class="wlist">
+      ${items || `<p class="small" style="margin:0">No Solana wallet found in this browser. Install one, then reload this page.</p>
+        <a class="wopt" href="https://phantom.app/download" target="_blank" rel="noopener"><span class="ph-ico"></span>Get Phantom</a>
+        <a class="wopt" href="https://solflare.com/download" target="_blank" rel="noopener"><span class="ph-ico"></span>Get Solflare</a>
+        <a class="wopt" href="https://backpack.app/downloads" target="_blank" rel="noopener"><span class="ph-ico"></span>Get Backpack</a>`}
+      <button class="wopt" data-act="guestWallet"><span class="ph-ico" style="background:var(--or)"></span><span>Continue as guest</span></button>
+      <p class="small" style="margin:4px 0 0">Connecting shares your public address only.</p>
+    </div></section>`);
+}
+async function eagerConnect(){
+  let saved = null; try { saved = JSON.parse(localStorage.getItem(KEYW) || 'null'); } catch (e) {}
+  if (!saved) return;
+  if (saved.kind === 'guest' && saved.addr) { setWallet(saved.addr, null); return; }
+  detectInjected();
+  const entry = W.list.find(w => w.name === saved.name);
+  if (entry) { try { await connectEntry(entry, true); } catch (e) {} }
+}
+
+/* ---------- pictures ---------- */
+function yardSVG(){
+  const mine = myCk(), others = S.ck.filter(c => !isMine(c)).sort((a, b) => TIERS[b.tier].w - TIERS[a.tier].w || b.id - a.id);
+  const shown = [...mine.slice(0, 3), ...others].slice(0, 10);
+  let s = `<svg class="yard" viewBox="0 0 330 104" shape-rendering="crispEdges" role="img" aria-label="The barnyard: chickens in the flock with the eggs they’re forming.">`;
+  s += `<rect x="0" y="0" width="330" height="104" fill="#FFD898"/><rect x="0" y="78" width="330" height="26" fill="#E9B96A"/>`;
+  const r = mulberry(3);
+  for (let i = 0; i < 70; i++) s += `<rect x="${Math.floor(r() * 328)}" y="${80 + Math.floor(r() * 22)}" width="${2 + Math.floor(r() * 3)}" height="1" fill="#D9A453"/>`;
+  s += `<rect x="236" y="22" width="80" height="56" fill="#B42D27"/><rect x="232" y="18" width="88" height="5" fill="#7A1F1A"/><rect x="240" y="13" width="72" height="5" fill="#7A1F1A"/><rect x="250" y="8" width="52" height="5" fill="#7A1F1A"/><rect x="264" y="4" width="24" height="4" fill="#7A1F1A"/>`;
+  s += `<rect x="262" y="34" width="28" height="44" fill="#FFF4E0"/><rect x="265" y="37" width="22" height="41" fill="#8E241F"/><rect x="265" y="37" width="22" height="2" fill="#FFF4E0"/><rect x="275" y="37" width="2" height="41" fill="#FFF4E0"/><rect x="270" y="14" width="12" height="9" fill="#FFF4E0"/><rect x="272" y="16" width="8" height="5" fill="#3A2412"/>`;
+  s += `<rect x="18" y="58" width="22" height="12" fill="#E3B04B"/><rect x="18" y="62" width="22" height="1" fill="#C9902F"/><rect x="18" y="66" width="22" height="1" fill="#C9902F"/><rect x="44" y="62" width="16" height="8" fill="#E3B04B"/><rect x="44" y="65" width="16" height="1" fill="#C9902F"/>`;
+  for (let x = 6; x < 330; x += 22) s += `<rect x="${x}" y="40" width="3" height="38" fill="#D9A453"/>`;
+  s += `<rect x="0" y="48" width="330" height="2" fill="#D9A453"/><rect x="0" y="62" width="330" height="2" fill="#D9A453"/>`;
+  shown.forEach((c, i) => {
+    const x = 6 + i * 32.4, y = 48;
+    const eggs = isMine(c) ? Math.min(3, S.nest.filter(e => e.by === c.id).length) : Math.min(3, Math.floor(c.acc / 0.002));
+    s += `<g class="c"><title>#${c.id} ${TIERS[c.tier].name}, weight ${TIERS[c.tier].w}${isMine(c) ? ', yours' : ''}</title><g class="${i % 2 ? 'bob2' : 'bob'}"><use href="#ck${c.tier}" transform="translate(${x} ${y}) scale(.95)"/></g>`;
+    for (let k = 0; k < eggs; k++) s += `<use href="#egg" transform="translate(${x + 1 + k * 7} ${y + 30}) scale(1)"/>`;
+    if (isMine(c)) s += `<rect x="${x + 7}" y="${y - 6}" width="11" height="4" fill="#C8322D"/><text x="${x + 12.5}" y="${y - 3}" font-size="3.4" font-family="Azeret Mono,monospace" fill="#FFF" text-anchor="middle">YOU</text>`;
+    s += `</g>`;
+  });
+  return s + '</svg>';
+}
+function ownership(){
+  const W0 = totalW(); if (!W0) return '';
+  const byTier = [0, 1, 2, 3].map(t => S.ck.filter(c => c.tier === t).reduce((a, c) => a + TIERS[c.tier].w, 0));
+  const myW = myCk().reduce((a, c) => a + TIERS[c.tier].w, 0);
+  const you = myW ? Math.max(1, Math.round(myW / W0 * 100)) : 0;
+  const cells = [];
+  for (let i = 0; i < you; i++) cells.push('you');
+  const rest = 100 - you; let acc = 0, remW = W0 - myW;
+  [3, 2, 1, 0].forEach(t => { const tw = byTier[t] - myCk().filter(c => c.tier === t).reduce((a, c) => a + TIERS[c.tier].w, 0); const n = Math.round(tw / Math.max(1e-9, remW) * rest); for (let i = 0; i < n && cells.length < 100; i++) cells.push(t); acc += n; });
+  while (cells.length < 100) cells.push(0);
+  return `<div class="own"><label>Who the egg pool pays · ${W0} weight across ${S.ck.length} chickens</label>
+    <div class="sq" aria-hidden="true">${cells.map(c => c === 'you' ? '<i class="you"></i>' : `<i style="background:${TIERS[c].body}"></i>`).join('')}</div>
+    <div class="keys">${TIERS.map(t => `<span><i style="background:${t.body}"></i>${t.short} ×${t.w}</span>`).join('')}${W.addr ? `<span><i style="background:var(--red)"></i>You: ${(myW / W0 * 100).toFixed(1)}%</span>` : ''}</div></div>`;
+}
+
+/* ---------- views ---------- */
+const TABS = [['yard','Barnyard',ICO.yard],['mint','Mint',ICO.mint],['coop','My coop',ICO.coop],['rentals','Rentals',ICO.rent],['how','How it works',ICO.how],['docs','Docs',ICO.docs]];
+let tab = 'yard';
+const D = { tier: 0 };
+const M = { sort: 'value', dur: 1 };
+const LST = { id: 0, share: 0.7, mult: 1 };
+const myCk = () => W.addr ? S.ck.filter(isMine) : [];
+const myRent = () => W.addr ? S.ck.filter(isRenting) : [];
+const myW = () => myCk().reduce((a, c) => a + TIERS[c.tier].w, 0);
+const LIVE = {
+  burned: () => fmtTok(S.burned),
+  pool: () => fmtSol(S.pool24) + ' SOL',
+  acc: id => fmtSol(ckById.get(+id)?.acc) + ' SOL',
+  next: id => { const c = ckById.get(+id); return c ? (S.nest.length >= nestCap() && c.next <= S.t + 600 ? 'Nest full' : left(c.next)) : ''; },
+  rentUn: id => fmtSol(ckById.get(+id)?.rentUn) + ' SOL',
+  rentAll: () => fmtSol(myRent().reduce((a, c) => a + c.rentUn, 0)) + ' SOL',
+  nestV: () => fmtSol(S.nest.reduce((a, e) => a + e.v, 0)) + ' SOL',
+  ago: t => ago(+t),
+  left: t => left(+t)
+};
+function kv(label, val, k){ return `<div><label>${label}</label><b${k ? ` data-k="${k}"` : ''}>${val}</b></div>`; }
+
+let latestSnap = null, latestAt = 0;
+function vYard(){
+  const nowR = performance.now();
+  if (!latestSnap || nowR - latestAt > 30000) { latestSnap = S.feed.filter(f => f.k === 'launch').slice(0, 6); latestAt = nowR; }
+  return `<div class="grid-hero"><div class="col">
+  <section class="panel">
+    <h2 class="ph">${ICO.yard} Status <small>the flock right now</small></h2>
+    <div class="pad">
+      <label>Chickens in the flock</label>
+      <div class="big"><b>${S.ck.length}</b><span>${totalW()} weight</span></div>
+      <div class="kv4">
+        ${kv('Egg pool, 24 h', fmtSol(S.pool24) + ' SOL', 'pool')}
+        ${kv('Coins funding it', S.coins.filter(c => c.alive).length)}
+        ${kv('Eggs laid', S.laid)}
+        ${kv('$INCUBATE burned', fmtTok(S.burned), 'burned')}
+      </div>
+      <button class="btn or wide" data-go="mint">Mint a chicken</button>
+    </div>
+  </section>
+  <section class="panel">
+    <h2 class="ph">${ICO.coin} $INCUBATE <small>token</small></h2>
+    <div class="kv2"><div><label>Project</label><b>Incubate</b></div><div><label>Ticker</label><b>$INCUBATE</b></div></div>
+    ${CFG.X ? `<div class="btnrow"><a class="btn" href="${esc(CFG.X)}" target="_blank" rel="noopener">Follow @IncubateDotLive on X</a></div>` : ''}
+  </section>
+  </div>
+  <section class="panel hero">
+    <h2 class="ph">${ICO.hatch} The barnyard <small>the flock and the eggs it’s forming</small></h2>
+    <div class="hero-copy">
+      <h1>Hatch chickens. Lay eggs. <em>Harvest yield.</em></h1>
+      <p>Each chicken is an NFT with a share of a pool of real creator fees from coins launched on pump.fun. It lays that share as eggs. Crack them for SOL, or hatch them into more chickens.</p>
+    </div>
+    <div class="yardwrap">${yardSVG()}</div>
+    <div class="econ">
+      <div><label>Chickens</label><b>${S.ck.length}</b><span>produce eggs from their share of fees</span></div>
+      <div><label>Eggs</label><b>${S.laid}</b><span>store fee rewards already earned</span></div>
+      <div><label>Hatching</label><b>${S.hatched}</b><span>expands the flock and funds new launches</span></div>
+    </div>
+    ${ownership()}
+  </section>
+  </div>
+  <section class="panel mt">
+    <h2 class="ph">${ICO.coin} Latest launches <small>coins feeding the egg pool</small><button class="link end" data-go="how">How the pool works</button></h2>
+    ${latestSnap.length ? `<div class="feed">${latestSnap.map(f => `<div>${ICO.coin}<b>$${esc(f.tick)}</b><p>${f.funded ? 'Funded by hatched eggs' : 'Launched by Incubate'}</p><span class="ago" data-k="ago:${f.t}">${ago(f.t)}</span></div>`).join('')}</div>`
+      : `<div class="empty">${ckTile(0)}<span>No launches yet.</span></div>`}
+  </section>
+  <section class="panel mt">
+    <h2 class="ph">${ICO.how} How it works <small>five steps</small><button class="link end" data-go="how">All the rules</button></h2>
+    ${stepsHTML()}
+  </section>`;
+}
+function stepsHTML(){
+  const st = [
+    [ICO.mint, 'Purchase a chicken', 'Mint a tradable chicken NFT. Its tier sets its weight in the egg pool.'],
+    [EGG, 'Lay eggs', 'Every few hours it lays an egg holding its share of creator fees earned since its last.'],
+    [ICO.hatch, 'Hatch eggs', 'Hatch an egg into a new chicken. Its SOL funds new launches for the whole flock.'],
+    [ICO.crack, 'Collect yield', 'Or crack the egg to claim the creator-fee rewards inside it as SOL.'],
+    [ICO.coop, 'Expand the coop', 'Spend $INCUBATE on nest space, faster laying and automatic harvesting.']
+  ];
+  return `<div class="steps">${st.map((x, i) => `<div>${x[0]}<span class="n">${pad2(i + 1)}</span><h3>${x[1]}</h3><p>${x[2]}</p></div>`).join('')}</div>`;
+}
+
+function vMint(){
+  const t = TIERS[D.tier], left0 = t.supply - S.minted[D.tier], W0 = totalW();
+  const can = W.addr && left0 > 0 && S.wal.sol >= t.price;
+  const after = (myW() + t.w) / (W0 + t.w) * 100;
+  return `<div class="grid-2"><div class="col">
+  <section class="panel step">
+    <h2 class="ph"><b>Step 1</b> <small>choose a chicken</small><span class="tag or end">Now</span></h2>
+    <div class="pad"><h3>Which chicken?</h3>
+      <p>The tier sets the chicken’s weight: how big a slice of the egg pool it gets. Price per unit of weight is the same for every tier.</p>
+      <div class="opts">${TIERS.map((d, i) => `<button class="opt" data-act="pickTier" data-i="${i}" aria-pressed="${D.tier === i}">${ckTile(i)}<b>${d.name}</b>
+        <dl><dt>Weight</dt><dd>${d.w}×</dd><dt>Price</dt><dd>${d.price.toFixed(2)} SOL</dd><dt>Left</dt><dd>${d.supply - S.minted[i]} / ${d.supply}</dd></dl></button>`).join('')}</div>
+      <p class="note">Weights decide how a fixed fee pool is shared, not what it pays. Every new chicken, minted or hatched, takes its slice from everyone else’s.</p>
+    </div>
+  </section>
+  <section class="panel step">
+    <h2 class="ph"><b>Step 2</b> <small>${t.price.toFixed(2)} SOL to mint</small></h2>
+    <div class="pad"><h3>${left0 > 0 ? `Mint a ${t.name}` : `${t.name}s are minted out`}</h3>
+      <p>${left0 > 0 ? 'Half the price buys and burns $INCUBATE; half goes to the launch fund, which launches coins whose fees feed the egg pool.' : 'Hatch one from an egg, or buy one on Tensor and Magic Eden.'}</p>
+      ${!W.addr ? `<button class="btn dark" data-act="wallet">Connect wallet to mint</button>`
+        : `<button class="btn dark" data-act="mint" ${can ? '' : 'disabled'}>Mint ${t.name}</button>${S.wal.sol < t.price ? `<p class="warn" style="margin:12px 0 0">Not enough SOL in your wallet.</p>` : ''}`}
+    </div>
+  </section></div>
+  <aside class="col">
+    <section class="panel"><h2 class="ph">${ICO.hatch} You get <small>after step 2</small></h2>
+      <div class="youget">${ckTile(D.tier)}<div><b>${t.w}×</b><span>${t.name}<br>Lays its first egg within the hour</span></div></div>
+    </section>
+    <section class="panel"><h2 class="ph">${ICO.coin} Summary <small>what moves</small></h2>
+      <div class="rows">
+        ${kv('Mint price', t.price.toFixed(2) + ' SOL')}
+        ${kv('Weight', t.w + '×')}
+        ${kv('Your pool share after', after.toFixed(2) + '%')}
+        ${kv('Egg pool, last 24 h', fmtSol(S.pool24) + ' SOL')}
+        ${kv('Wallet SOL', fmtSol(S.wal.sol) + ' SOL')}
+      </div>
+    </section>
+  </aside></div>`;
+}
+
+function vCoop(){
+  if (!W.addr) return `<section class="panel"><h2 class="ph">${ICO.coop} My coop</h2>
+    <div class="empty">${ckTile(0)}<span>Connect a wallet to see your chickens and their eggs.</span><button class="btn or" data-act="wallet">Connect wallet</button></div></section>`;
+  const mine = myCk(), rented = myRent(), cap = nestCap(), W0 = totalW(), hc = hatchCost();
+  const nest = S.nest.slice().sort((a, b) => b.t - a.t);
+  return `<section class="panel"><h2 class="ph">${ICO.coop} My coop <small>eggs hold fees already earned</small></h2>
+    <div class="kv5">
+      <div><label>Chickens</label><b>${mine.length}</b></div>
+      <div><label>Your weight</label><b>${myW()}</b></div>
+      <div><label>Pool share</label><b>${W0 ? (myW() / W0 * 100).toFixed(2) : 0}%</b></div>
+      <div><label>Eggs in nest</label><b>${S.nest.length} / ${cap}</b></div>
+      <div><label>Nest value</label><b class="g" data-k="nestV">${LIVE.nestV()}</b></div>
+    </div>
+    <div class="actions">
+      <button class="btn or" data-act="crackAll" ${S.nest.length ? '' : 'disabled'}>Crack all eggs</button>
+      <button class="btn" data-go="mint">Mint a chicken</button>
+      <button class="btn" data-go="rentals">Rent a chicken</button>
+      <button class="btn" data-act="buyInc" ${S.wal.sol < 1 ? 'disabled' : ''}>Swap 1 SOL for $INCUBATE</button>
+    </div>
+  </section>
+  <section class="panel mt"><h2 class="ph">${EGG} The nest <small>crack for SOL, or hatch for ${fmtTok(hc)} $INCUBATE</small></h2>
+    <div class="nest">${nest.map(e => `<div class="egg">${EGG}<b>${fmtSol(e.v)} SOL</b><p>Laid by #${e.by} ${TIERS[e.tier].short}, <span data-k="ago:${e.t}">${ago(e.t)}</span></p>
+      <div class="btns"><button class="btn sm or" data-act="crack" data-e="${e.id}">Crack</button><button class="btn sm" data-act="hatch" data-e="${e.id}" ${e.v < CFG.MIN_HATCH || S.wal.inc < hc ? 'disabled' : ''} title="${e.v < CFG.MIN_HATCH ? 'Too small to hatch' : ''}">Hatch</button></div></div>`).join('')}
+      ${Array.from({ length: Math.max(0, cap - nest.length) }, () => `<div class="egg slot">Empty nest slot</div>`).join('')}</div>
+    <p class="small" style="margin:0;padding:12px 18px;border-top:1.5px solid var(--rule)">Hatching odds: Common 80%, Rare 15%, Golden 4.5%, Legendary 0.5%. An egg needs at least ${CFG.MIN_HATCH} SOL inside to hatch; that SOL goes to the launch fund.</p>
+  </section>
+  <div class="two mt">
+    <section class="panel"><h2 class="ph">${ICO.coop} Strategy <small>what to do with new eggs</small></h2>
+      ${S.coop.auto ? `<div class="up"><b>Automatic ${S.coop.mode === 'harvest' ? 'harvest' : 'compound'}</b><small>${S.coop.mode === 'harvest' ? 'Every new egg is cracked straight to your wallet.' : 'Every new egg hatches when it can, if you have the $INCUBATE.'}</small><div class="seg">${[['harvest','Harvest'],['compound','Compound']].map(([k, t]) => `<button class="chip" data-act="setMode" data-m="${k}" aria-pressed="${S.coop.mode === k}">${t}</button>`).join('')}</div></div>`
+        : `<div class="up"><b>Manual</b><small>New eggs wait in the nest for you to crack or hatch. Laying pauses when the nest is full, but fees keep building inside the next egg.</small><button class="btn sm or" data-act="buyAuto" ${S.wal.inc < AUTO_COST ? 'disabled' : ''}>Automate · ${fmtTok(AUTO_COST)}</button></div>`}
+    </section>
+    <section class="panel"><h2 class="ph">${ICO.coin} Coop upgrades <small>paid in $INCUBATE, all burned</small></h2>
+      ${['nest', 'speed'].map(k => { const u = UP[k], l = S.coop[k], max = l >= u.max, c = u.cost(l); return `<div class="up"><b>${u.name}<span class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span></b><small>${max ? 'Maxed out' : u.eff(l)}</small><button class="btn sm" data-act="upgrade" data-k="${k}" ${max || S.wal.inc < c ? 'disabled' : ''}>${max ? 'Maxed' : 'Upgrade · ' + fmtTok(c)}</button></div>`; }).join('')}
+    </section>
+  </div>
+  ${rented.length ? `<section class="panel mt"><h2 class="ph">${ICO.rent} Rented by you <small>your share settles when the rental ends</small></h2>
+    ${rented.map(c => `<div class="crow"><div>${ckTile(c.tier)}</div><div><h3>#${c.id} <span class="tag ghost">${TIERS[c.tier].name}</span></h3>
+      <div class="stats"><div><label>Time left</label><b data-k="left:${c.rent.until}">${left(c.rent.until)}</b></div><div><label>You keep</label><b>${Math.round(c.rent.share * 100)}% of its eggs</b></div><div><label>Your share so far</label><b data-k="rentUn:${c.id}">${LIVE.rentUn(c.id)}</b></div><div><label>Weight</label><b>${TIERS[c.tier].w}×</b></div></div></div>
+      <div><p class="small" style="margin:0">Owner ${short(c.owner)} keeps the rest of its egg rewards plus your rental payment.</p></div></div>`).join('')}
+  </section>` : ''}
+  <section class="panel mt"><h2 class="ph">${ICO.hatch} Your chickens <small>${mine.length}</small></h2>
+    ${mine.length ? mine.map(c => `<div class="crow"><div>${ckTile(c.tier)}</div>
+      <div><h3>#${c.id} <span class="tag ghost">${TIERS[c.tier].name}</span>${c.hatched ? '<span class="tag or">Hatched</span>' : ''}</h3>
+        <div class="stats"><div><label>Weight</label><b>${TIERS[c.tier].w}×</b></div><div><label>Next egg</label><b data-k="next:${c.id}">${LIVE.next(c.id)}</b></div><div><label>Forming egg</label><b data-k="acc:${c.id}">${LIVE.acc(c.id)}</b></div><div><label>Eggs laid</label><b>${c.eggs}</b></div></div></div>
+      <div><div class="rentbox">${c.rent ? `<b>Rented out</b><p>To ${short(c.rent.who)} for ${left(c.rent.until)} more. They keep ${Math.round(c.rent.share * 100)}% of its egg rewards; you keep the rest plus the rental payment.</p>`
+        : c.list ? `<b>Listed for rent</b><p>${fmtTok(c.list.price)} $INCUBATE an hour, renter keeps ${Math.round(c.list.share * 100)}% of its eggs.</p><div class="btns"><button class="btn sm" data-act="listOpen" data-id="${c.id}">Edit</button><button class="btn sm" data-act="unlist" data-id="${c.id}">Unlist</button></div>`
+        : `<b>Not listed</b><p>Rent it to other farmers for $INCUBATE. They get an agreed share of its eggs; you collect the rent.</p><button class="btn sm or" data-act="listOpen" data-id="${c.id}">List for rent</button>`}</div></div></div>`).join('')
+      : `<div class="empty">${ckTile(0)}<span>No chickens yet. Mint one and it starts laying.</span><button class="btn sm or" data-go="mint">Mint a chicken</button></div>`}
+  </section>`;
+}
+
+function vRentals(){
+  const d = DURS[M.dur], W0 = totalW();
+  const list = S.ck.filter(c => c.list);
+  const val = c => c.list.share * TIERS[c.tier].w / c.list.price;
+  const sorters = { value: (a, b) => val(b) - val(a), price: (a, b) => a.list.price - b.list.price, weight: (a, b) => TIERS[b.tier].w - TIERS[a.tier].w, share: (a, b) => b.list.share - a.list.share };
+  list.sort((a, b) => (!!a.rent - !!b.rent) || sorters[M.sort](a, b));
+  const segb = (key, val, label) => `<button class="chip" data-act="m" data-key="${key}" data-val="${val}" aria-pressed="${String(M[key]) === String(val)}">${label}</button>`;
+  return `<section class="panel"><h2 class="ph">${ICO.rent} Chickens for rent <small>${list.length} listed · renters get an agreed share of the eggs</small></h2>
+    <div class="filters">
+      <div class="seg"><span>Rent for</span>${DURS.map((x, i) => segb('dur', i, x.name + (x.off ? ` (−${x.off * 100}%)` : ''))).join('')}</div>
+      <div class="seg"><span>Sort</span>${segb('sort','value','Best value')}${segb('sort','weight','Weight')}${segb('sort','price','Price')}${segb('sort','share','Renter share')}</div>
+    </div>
+    ${list.length ? `<div class="lists">${list.map(c => { const cost = c.list.price * d.h * (1 - d.off), mine = isMine(c), est = poolRate() * TIERS[c.tier].w / W0 * c.list.share * d.h;
+      return `<div class="lcard">${ckTile(c.tier)}<div><h4>#${c.id}${mine ? '<span class="tag or">Yours</span>' : ''}</h4>
+        <dl><dt>Chicken</dt><dd>${TIERS[c.tier].name}</dd><dt>Weight</dt><dd>${TIERS[c.tier].w}×</dd><dt>Renter keeps</dt><dd>${Math.round(c.list.share * 100)}% of eggs</dd><dt>At today’s pool</dt><dd>≈ ${fmtSol(est)} SOL / ${d.name}</dd><dt>Price</dt><dd>${fmtTok(c.list.price)} /h</dd></dl>
+        ${c.rent ? `<button class="btn sm" disabled>Rented, back in ${left(c.rent.until)}</button>` : mine ? `<button class="btn sm" data-go="coop">Manage listing</button>`
+          : !W.addr ? `<button class="btn sm" data-act="wallet">Connect wallet</button>`
+          : `<button class="btn sm or" data-act="rent" data-id="${c.id}" ${S.wal.inc < cost ? 'disabled' : ''}>Rent ${d.name} · ${fmtTok(cost)}</button>`}
+      </div></div>`; }).join('')}</div>` : `<div class="empty">${ckTile(0)}<span>No chickens listed right now.</span></div>`}
+    <p class="small" style="margin:0;padding:12px 18px;border-top:1.5px solid var(--rule)">Estimates use the last 24 hours of the egg pool. Future fees can be lower or higher; the pool only pays out what coins actually earn.</p>
+  </section>`;
+}
+function listModal(id){
+  const c = ckById.get(+id); if (!isMine(c)) return;
+  if (LST.id !== c.id) { LST.id = c.id; LST.share = c.list ? c.list.share : 0.7; LST.mult = 1; }
+  const p = r50(fair(c, LST.share) * LST.mult);
+  modal(`<section class="panel modal" role="dialog" aria-modal="true" aria-labelledby="lt">
+    <h2 class="ph" id="lt">${ICO.rent} List #${c.id} for rent <button class="x" data-act="close" aria-label="Close">×</button></h2>
+    <div class="pad">
+      <label>Renter keeps</label>
+      <div class="seg" style="margin-bottom:16px">${[0.5,0.6,0.7,0.8].map(s => `<button class="chip" data-act="lsShare" data-v="${s}" aria-pressed="${LST.share === s}">${s * 100}% of eggs</button>`).join('')}</div>
+      <label>Hourly price</label>
+      <div class="seg" style="margin-bottom:16px">${[[0.8,'Fill fast'],[1,'Suggested'],[1.3,'Premium']].map(([m, t]) => `<button class="chip" data-act="lsMult" data-v="${m}" aria-pressed="${LST.mult === m}">${t}</button>`).join('')}</div>
+      <div class="rows" style="border:1.5px solid var(--rule);margin-bottom:16px">
+        ${kv('Price per hour', fmtTok(p) + ' $INCUBATE')}
+        ${kv('Per day / week', `${fmtTok(p * 24 * 0.9)} / ${fmtTok(p * 168 * 0.75)}`)}
+        ${kv('You receive', '90% of each payment')}
+        ${kv('Burned', '10% of each payment')}
+      </div>
+      <p class="small" style="margin:0 0 16px">The suggested price is based on this chicken’s weight and the last day of the egg pool. Demand isn’t guaranteed.</p>
+      <button class="btn or wide" data-act="listSave" data-id="${c.id}" data-p="${p}">${c.list ? 'Update listing' : 'List #' + c.id}</button>
+    </div></section>`);
+}
+
+function flywheel(){
+  const L = ['More chickens hatched','More $INCUBATE spent on incubation','More farming activity','More creator-fee revenue','More egg rewards','More demand for chickens','Buybacks and burns'];
+  const cx = 380, cy = 180, rx = 290, ry = 135, n = L.length;
+  let s = `<svg viewBox="0 0 760 360" role="img" aria-label="The $INCUBATE flywheel"><ellipse class="ringe" cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>`;
+  L.forEach((_, i) => { const a = (i + 0.5) / n * 2 * Math.PI - Math.PI / 2, x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a), rot = Math.atan2(ry * Math.cos(a), -rx * Math.sin(a)) * 180 / Math.PI; s += `<path class="arr" d="M -7 -6 L 7 0 L -7 6 Z" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})"/>`; });
+  L.forEach((t, i) => { const a = i / n * 2 * Math.PI - Math.PI / 2, x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a); s += `<g class="node${i === 6 ? ' hot' : ''}"><rect x="${(x - 122).toFixed(1)}" y="${(y - 19).toFixed(1)}" width="244" height="38"/><text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${t}</text></g>`; });
+  return s + `</svg><ol>${L.map(t => `<li>${t}</li>`).join('')}</ol>`;
+}
+function vHow(){
+  const sq = Array.from({ length: 100 }, (_, i) => `<i class="${i < 60 ? 'sq-a' : i < 85 ? 'sq-b' : 'sq-c'}"></i>`).join('');
+  return `<section class="panel"><h2 class="ph">${ICO.how} How it works <small>the egg economy</small></h2>${stepsHTML()}</section>
+  <section class="panel mt"><h2 class="ph">${EGG} Two strategies</h2>
+    <div class="strat">
+      <div><h3>${ICO.crack} Harvest</h3><p>Crack eggs to collect the creator-fee rewards inside them as SOL. Your share of the pool stays the same, and shrinks a little as others hatch.</p></div>
+      <div><h3>${ICO.hatch} Compound</h3><p>Hatch eggs into more chickens to raise your share of future revenue. The egg’s SOL goes to the launch fund and the incubation fee in $INCUBATE is burned.</p></div>
+    </div>
+    <p class="backed"><b>Every egg is backed.</b> Eggs only ever hold creator fees that coins have already earned. A new chicken doesn’t create new yield: it takes a slice of the same pool from every other chicken, and the SOL used to hatch it funds new launches that add revenue for the whole flock.</p>
+  </section>
+  <section class="panel mt"><h2 class="ph">${ICO.coin} Where every creator fee goes <small>100 squares, one per percent</small></h2>
+    <div class="split"><div class="squares" aria-hidden="true">${sq}</div></div>
+    <div class="splitkeys">
+      <div><span class="k"><i class="sq-a"></i>Egg pool</span><b>60%</b><p>Shared across every chicken by weight and laid as eggs.</p></div>
+      <div><span class="k"><i class="sq-b"></i>Buy and burn</span><b>25%</b><p>Buys $INCUBATE on the market and burns it.</p></div>
+      <div><span class="k"><i class="sq-c"></i>Operations</span><b>15%</b><p>Pays for launching coins and running the keeper.</p></div>
+    </div>
+  </section>
+  <div class="two mt">
+    <section class="panel"><h2 class="ph">${ICO.hatch} Chicken tiers</h2>
+      <div class="tw"><table><thead><tr><th></th><th>Chicken</th><th class="r">Weight</th><th class="r">Mint</th><th class="r">Hatch odds</th></tr></thead><tbody>
+      ${TIERS.map((t, i) => `<tr><td>${ckTile(i)}</td><td><b>${t.name}</b></td><td class="r">${t.w}×</td><td class="r">${t.price.toFixed(2)} SOL</td><td class="r">${(t.odds * 100).toFixed(1)}%</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="note" style="margin:0 18px 18px">Weights decide how a defined fee pool is shared. They are not guaranteed returns.</p>
+    </section>
+    <section class="panel"><h2 class="ph">${ICO.rent} Rentals and the coop</h2>
+      <div class="pbody"><p>Owners rent chickens to other farmers for $INCUBATE. Renters get an agreed share of the chicken’s egg rewards; owners keep the rest and collect the rent, 90% of each payment, with 10% burned.</p>
+      <p>Coop upgrades add nest space and speed up laying. Automation cracks or hatches every new egg for you, depending on your strategy.</p></div>
+    </section>
+  </div>
+  <section class="panel mt"><h2 class="ph">${ICO.yard} The flywheel</h2><div class="fly">${flywheel()}</div></section>`;
+}
+
+const DOCS = [
+  ['overview','Overview', () => `<p>Incubate launches coins on pump.fun and shares their creator fees with a flock of chicken NFTs. Each chicken has a <strong>weight</strong> set by its tier. 60% of all creator fees goes into the <strong>egg pool</strong>, split across every chicken by weight.</p>
+    <p>A chicken’s share collects inside its next egg. Every few hours the chicken lays it. Crack the egg to take the SOL, or hatch it into a new chicken.</p>`],
+  ['minting','Minting', () => `<div class="tw"><table><thead><tr><th>Chicken</th><th class="r">Weight</th><th class="r">Price</th><th class="r">Supply</th></tr></thead><tbody>${TIERS.map(t => `<tr><td>${t.name}</td><td class="r">${t.w}×</td><td class="r">${t.price.toFixed(2)} SOL</td><td class="r">${t.supply}</td></tr>`).join('')}</tbody></table></div>
+    <p>Price per unit of weight is the same for every tier. Half of each mint buys and burns $INCUBATE; half goes to the launch fund.</p>`],
+  ['eggs','Eggs', () => `<p>Each chicken lays an egg every ${CFG.LAY_H} hours, faster with coop upgrades. The egg holds exactly the chicken’s share of the pool since its last egg. If the nest is full, laying pauses and fees keep building inside the next egg; nothing is lost.</p>
+    <h4>Crack</h4><p>Cracking sends the egg’s SOL to your wallet.</p>
+    <h4>Hatch</h4><p>Hatching costs an incubation fee of <code>6,000 + 1,500 × your chickens</code> $INCUBATE (at most 30,000), which is burned. The egg must hold at least ${CFG.MIN_HATCH} SOL, and that SOL goes to the launch fund. Odds: Common 80%, Rare 15%, Golden 4.5%, Legendary 0.5%.</p>`],
+  ['backing','How yield stays backed', () => `<p>Egg rewards come only from creator fees coins have actually earned. Nothing is minted to pay yield.</p>
+    <ul><li>The egg pool is a fixed 60% of real fees. More chickens never make it bigger on their own.</li><li>A minted or hatched chicken adds weight, so every other chicken’s slice gets smaller.</li><li>The SOL in hatched eggs and half of every mint go to the launch fund. Each time it reaches ${CFG.FUND_LAUNCH_AT} SOL, Incubate launches another coin, adding new revenue to the pool.</li></ul>`],
+  ['fees','Fees', () => `<div class="tw"><table><thead><tr><th>To</th><th class="r">Share</th></tr></thead><tbody><tr><td>Egg pool, split by weight</td><td class="r">60%</td></tr><tr><td>$INCUBATE buy and burn</td><td class="r">25%</td></tr><tr><td>Operations</td><td class="r">15%</td></tr></tbody></table></div>
+    <h4>Launch rules</h4><ul><li>No real people’s names or likeness, and no implied endorsement.</li><li>No existing brands, and no ticker that is already live on pump.fun.</li><li>No promises of returns.</li></ul>`],
+  ['rentals','Rentals', () => `<p>Owners list chickens by the hour, day or week, priced in $INCUBATE, and choose what share of the chicken’s egg rewards the renter keeps: 50% to 80%. A day is 10% cheaper per hour, a week 25% cheaper. 90% of each payment goes to the owner and 10% is burned. The renter’s share settles to their wallet when the rental ends.</p>`],
+  ['coop','The coop', () => `<p><strong>Nest capacity</strong> holds 3 eggs, plus 2 per level, up to 11. <strong>Laying speed</strong> makes each level lay 15% sooner. <strong>Automation</strong> (${fmtTok(AUTO_COST)} $INCUBATE, once) cracks or hatches each new egg as it’s laid. All are paid in $INCUBATE and burned.</p>`],
+  ['faq','FAQ', () => [
+      ['Is the yield guaranteed?','No. Eggs hold a share of whatever fees coins earn. Most coins go quiet within days, and the pool can shrink.'],
+      ['Doesn’t hatching dilute everyone?','Yes, by design. Every new chicken takes a share from the rest. Hatched eggs also fund new launches, which is the only way the pool grows.'],
+      ['Harvest or compound?','Harvest takes SOL now. Compound grows your share of future fees at the cost of SOL now and an incubation fee. Neither is guaranteed to come out ahead.'],
+      ['What happens when I sell a chicken?','Its weight and its forming egg go with it. Eggs already in your nest stay yours.']
+    ].map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('')],
+  ['risks','Risks', () => `<ul><li>Most coins on pump.fun stop trading within days. When fees fall, eggs get smaller.</li>
+    <li>Your share of the pool shrinks every time anyone mints or hatches a chicken.</li>
+    <li>Rental demand isn’t guaranteed. A rented chicken can earn less than the rent paid.</li>
+    <li>A chicken’s market price can fall far below what was paid to mint it.</li>
+    <li>pump.fun can change its fee rates or creator fee program at any time.</li>
+    <li>Smart contracts can have bugs even after testing.</li></ul>
+    <p class="small">Chickens, eggs, $INCUBATE and every coin launched here can go to zero. Nothing on this site is financial advice; only put in what you can afford to lose.</p>`]
+];
+function vDocs(){
+  return `<div class="docs"><nav class="panel toc" aria-label="Docs contents"><h2 class="ph">${ICO.docs} Docs <small>contents</small></h2>
+    <ol>${DOCS.map((d, i) => `<li><button data-act="docjump" data-id="${d[0]}"><span>${pad2(i + 1)}</span>${d[1]}</button></li>`).join('')}</ol></nav>
+    <div class="col">${DOCS.map(d => `<section class="panel doc" id="doc-${d[0]}"><h2 class="ph">${d[1]}</h2><div class="body">${d[2]()}</div></section>`).join('')}</div></div>`;
+}
+
+/* ---------- render ---------- */
+let lastVer = -1, lastTab = '', lastRender = 0;
+const VIEWS = { yard: vYard, mint: vMint, coop: vCoop, rentals: vRentals, how: vHow, docs: vDocs };
+function render(force){
+  const now = performance.now();
+  const dynamic = !(tab === 'how' || tab === 'docs');
+  if (!force && tab === lastTab && (!dynamic || S.ver === lastVer || now - lastRender < 1500)) return;
+  lastVer = S.ver; lastTab = tab; lastRender = now;
+  const y = window.scrollY;
+  $('#view').innerHTML = VIEWS[tab]();
+  window.scrollTo(0, y);
+}
+function paintTabs(){ $('#tabs').innerHTML = TABS.map(([k, label, icon], i) => `<a href="#${k}"${tab === k ? ' aria-current="page"' : ''}>${icon}<span>${label}</span><em>${i + 1}</em></a>`).join(''); }
+function updateLive(){ document.querySelectorAll('[data-k]').forEach(el => { const [k, a] = el.dataset.k.split(':'); const f = LIVE[k]; if (!f) return; const v = f(a); if (el.textContent !== v) el.textContent = v; }); }
+function route(){ const h = location.hash.replace('#', ''); tab = VIEWS[h] ? h : 'yard'; paintTabs(); render(true); updateLive(); }
+
+/* ---------- overlays ---------- */
+let lastFocus = null;
+function modal(html){ if (!$('#overlay').innerHTML) lastFocus = document.activeElement; $('#overlay').innerHTML = `<div class="scrim" data-act="scrim">${html}</div>`; const f = $('#overlay').querySelector('[aria-pressed="true"],button,a'); f && f.focus(); }
+function closeModal(){ $('#overlay').innerHTML = ''; LST.id = 0; lastFocus && lastFocus.focus && lastFocus.focus(); }
+function toast(msg){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; const box = $('#toasts'); box.appendChild(t); while (box.children.length > 3) box.firstChild.remove(); setTimeout(() => t.remove(), 3800); }
+
+/* ---------- actions ---------- */
+const after = () => { S.ver++; render(true); updateLive(); };
+document.addEventListener('click', async ev => {
+  const go = ev.target.closest('[data-go]');
+  if (go) { if ($('#overlay').innerHTML) closeModal(); location.hash = '#' + go.dataset.go; return; }
+  const a = ev.target.closest('[data-act]');
+  if (!a) { if (!ev.target.closest('.walletcell')) $('#walletMenu').hidden = true; return; }
+  const act = a.dataset.act;
+  if (act === 'scrim') { if (ev.target === a) closeModal(); return; }
+  switch (act) {
+    case 'close': closeModal(); break;
+    case 'wallet':
+      if (W.addr && a.id === 'walletBtn') { const m = $('#walletMenu'); paintWallet(); m.hidden = !m.hidden; }
+      else openWalletModal();
+      break;
+    case 'pickWallet': {
+      const entry = W.list[+a.dataset.i];
+      a.disabled = true; const em = a.querySelector('em'); if (em) em.textContent = 'Approve in wallet…';
+      try { await connectEntry(entry, false); closeModal(); toast(`Connected ${short(W.addr)}`); }
+      catch (err) { a.disabled = false; if (em) em.textContent = 'Detected'; toast(err && err.message && /reject|denied|cancel/i.test(err.message) ? 'Connection request was declined in the wallet.' : 'Couldn’t connect. Unlock the wallet and try again.'); }
+      break; }
+    case 'guestWallet': setWallet(randAddr(Math.random), null); closeModal(); toast('Connected as guest'); break;
+    case 'disconnect': clearWallet(); toast('Wallet disconnected'); break;
+    case 'copyAddr': try { await navigator.clipboard.writeText(W.addr); toast('Address copied'); } catch (e) { toast(W.addr); } break;
+    case 'pickTier': D.tier = +a.dataset.i; render(true); break;
+    case 'mint': {
+      const t = TIERS[D.tier]; if (!W.addr || S.minted[D.tier] >= t.supply || S.wal.sol < t.price) break;
+      S.wal.sol -= t.price; S.minted[D.tier]++; S.burnSol += t.price * 0.5; S.burned += t.price * 0.5 / price(); S.fund += t.price * 0.5;
+      const c = newChicken(D.tier, W.addr, true); feedPush({ k: 'mint', tier: D.tier, user: true }); save();
+      toast(`You minted a ${t.name}, #${c.id}. Its first egg is on the way.`); location.hash = '#coop'; after(); break; }
+    case 'crack': { const e = S.nest.find(x => x.id === +a.dataset.e); if (!e) break; crack(e); toast(`Cracked an egg: +${fmtSol(e.v)} SOL`); after(); break; }
+    case 'crackAll': { const v = S.nest.reduce((s, e) => s + e.v, 0); S.nest.slice().forEach(crack); toast(`Cracked every egg: +${fmtSol(v)} SOL`); after(); break; }
+    case 'hatch': { const e = S.nest.find(x => x.id === +a.dataset.e); if (!e) break; const c = hatch(e); if (c) toast(`It hatched! A ${TIERS[c.tier].name}, #${c.id}, joins your coop.`); after(); break; }
+    case 'buyAuto': if (S.wal.inc >= AUTO_COST && !S.coop.auto) { S.wal.inc -= AUTO_COST; S.burned += AUTO_COST; S.coop.auto = true; toast('Automation installed. Pick harvest or compound.'); after(); } break;
+    case 'setMode': S.coop.mode = a.dataset.m; after(); break;
+    case 'upgrade': { const k = a.dataset.k, u = UP[k], l = S.coop[k]; if (l >= u.max) break; const c = u.cost(l); if (S.wal.inc < c) break; S.wal.inc -= c; S.burned += c; S.coop[k]++; toast(`${u.name} is now level ${S.coop[k]}. ${fmtTok(c)} $INCUBATE burned.`); after(); break; }
+    case 'buyInc': if (S.wal.sol >= 1) { const t = 1 / price(); S.wal.sol -= 1; S.wal.inc += t; toast(`Swapped 1 SOL for ${fmtTok(t)} $INCUBATE`); after(); } break;
+    case 'm': M[a.dataset.key] = a.dataset.key === 'dur' ? +a.dataset.val : a.dataset.val; render(true); break;
+    case 'listOpen': LST.id = 0; listModal(a.dataset.id); break;
+    case 'lsShare': LST.share = +a.dataset.v; listModal(LST.id); break;
+    case 'lsMult': LST.mult = +a.dataset.v; listModal(LST.id); break;
+    case 'listSave': { const c = ckById.get(+a.dataset.id); if (!isMine(c)) break; c.list = { share: LST.share, price: +a.dataset.p, k: LST.mult }; closeModal(); toast(`#${c.id} listed at ${fmtTok(c.list.price)} $INCUBATE an hour`); after(); break; }
+    case 'unlist': { const c = ckById.get(+a.dataset.id); if (!isMine(c)) break; c.list = null; toast(`#${c.id} unlisted`); after(); break; }
+    case 'rent': {
+      const c = ckById.get(+a.dataset.id), d = DURS[M.dur]; if (!W.addr || !c || !c.list || c.rent || isMine(c)) break;
+      const cost = c.list.price * d.h * (1 - d.off); if (S.wal.inc < cost) break;
+      S.wal.inc -= cost; startRent(c, W.addr, true, d.h, cost, c.list.share);
+      toast(`You’re renting #${c.id} for ${d.name}. You keep ${Math.round(c.list.share * 100)}% of its eggs.`); location.hash = '#coop'; after(); break; }
+    case 'docjump': { const el = document.getElementById('doc-' + a.dataset.id); el && el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); break; }
+  }
+  if (act !== 'wallet' && !a.closest('#walletMenu')) $('#walletMenu').hidden = true;
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if ($('#overlay').innerHTML) closeModal(); $('#walletMenu').hidden = true; } });
+window.addEventListener('hashchange', route);
+
+/* ---------- boot ---------- */
+load();
+S.speed = 60;
+route();
+paintWallet();
+setTimeout(eagerConnect, 500);
+let lastTick = performance.now(), lastSave = 0;
+setInterval(() => {
+  const now = performance.now(), dt = Math.min(2, (now - lastTick) / 1000); lastTick = now;
+  if (S.speed > 0) advance(S.speed * dt / 60);
+  updateLive(); render(false);
+  if (now - lastSave > 5000) { save(); lastSave = now; }
+}, 250);
+window.addEventListener('pagehide', save);
+</script>
+</body>
+</html>
